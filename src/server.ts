@@ -76,26 +76,28 @@ const server = http.createServer(  (req: IncomingMessage, res: ServerResponse) =
         console.log("Body");
         console.log(body);
         
-        console.log("\nFind Pokemon")
-        let pokemonToUpdate = database.find(pokemon => pokemon.id === pokemonId);
-        let pokemonIndex = database.findIndex(pokemon => pokemon.id === pokemonId);
+        req.on('end', () => {
+            console.log("\nFind Pokemon")
+            let pokemonToUpdate = database.find(pokemon => pokemon.id === pokemonId);
+            let pokemonIndex = database.findIndex(pokemon => pokemon.id === pokemonId);
 
-        console.log("\nUpdate")
-        if (pokemonToUpdate) {
-            console.log("\nThe updates");
-            
-            const pokemonUpdates: Partial<Pokemon> = JSON.parse(body);
-            console.log("Yo");
+            console.log("\nUpdate")
+            if (pokemonToUpdate) {
+                console.log("\nThe updates");
+                
+                const pokemonUpdates: Partial<Pokemon> = JSON.parse(body);
+                console.log("Yo");
 
-            res.statusCode = 204;
-            database[pokemonIndex] = pokemonToUpdate;
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify({ message: 'Pokemon updated' }, null, 2));
-        } 
-        else {        
-            res.statusCode = 404;
-            res.end(JSON.stringify({ message: 'Pokemon not found' }, null, 2));
-        }
+                res.statusCode = 204;
+                database[pokemonIndex] = {...pokemonToUpdate, ...pokemonUpdates};
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify({ message: 'Pokemon updated' }, null, 2));
+            } 
+            else {        
+                res.statusCode = 404;
+                res.end(JSON.stringify({ message: 'Pokemon not found' }, null, 2));
+            }
+        });
     }
 }
 );
